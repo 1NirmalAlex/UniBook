@@ -1,4 +1,11 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="com.unibook.util.HtmlEscape"%>
+<%
+    String loginNext = request.getParameter("next");
+    if (loginNext == null) {
+        loginNext = (String) request.getAttribute("loginNext");
+    }
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -310,9 +317,17 @@
                     <p class="error"><%= errorMessage %></p>
                 <%
                     }
+                    if ("1".equals(request.getParameter("registered"))) {
+                %>
+                    <p style="margin: 22px 0 10px; padding: 13px 15px; border-radius: 14px; background: #ECFDF5; border: 1px solid #A7F3D0; color: #047857; text-align: center; font-size: 14px; font-weight: 600;">Registration successful. You can log in now.</p>
+                <%
+                    }
                 %>
 
-                <form action="loginUser" method="post">
+                <form action="<%= request.getContextPath() %>/loginUser" method="post">
+                    <% if (loginNext != null && !loginNext.trim().isEmpty()) { %>
+                        <input type="hidden" name="next" value="<%= HtmlEscape.escape(loginNext.trim()) %>"/>
+                    <% } %>
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="email">Email Address</label>
@@ -332,7 +347,7 @@
                     </div>
                 </form>
 
-                <p class="footer-note">UniBook Student Platform • Clean • Smart • Modern</p>
+                <p class="footer-note"><a href="<%= request.getContextPath() %>/signup.jsp" style="color:#2563EB;font-weight:600;text-decoration:none;">Create an account</a> · UniBook Student Platform</p>
             </div>
         </div>
     </div>

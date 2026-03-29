@@ -1,0 +1,11 @@
+<%-- Unified header: brand + Feed, Events, Profile, Log out (static include; uses EL only — no extra scriptlet variables). --%>
+<div class="app-topbar app-topbar--unified">
+    <a class="brand" style="text-decoration:none;" href="${pageContext.request.contextPath}/feed">Uni<span>Book</span></a>
+    <nav class="app-topbar-links" aria-label="Main">
+        <a href="${pageContext.request.contextPath}/feed">Feed</a>
+        <a href="${pageContext.request.contextPath}/events">Events</a>
+        <a href="${pageContext.request.contextPath}/friends">Friends</a>
+        <a href="${pageContext.request.contextPath}/profile">Profile</a>
+        <a href="${pageContext.request.contextPath}/logout">Log out</a>
+    </nav>
+</div>

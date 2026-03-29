@@ -1,15 +1,42 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="com.unibook.model.User"%>
+<%@page import="com.unibook.model.Post"%>
+<%@page import="com.unibook.util.HtmlEscape"%>
+<%@page import="java.util.List"%>
+<%@page import="java.time.format.DateTimeFormatter"%>
+<%@ include file="/includes/authCheck.jspf" %>
+<%
+    if (request.getAttribute("timelinePosts") == null) {
+        response.sendRedirect(request.getContextPath() + "/feed");
+        return;
+    }
+    @SuppressWarnings("unchecked")
+    List<Post> timelinePosts = (List<Post>) request.getAttribute("timelinePosts");
+    DateTimeFormatter postTimeFmt = DateTimeFormatter.ofPattern("MMM d, yyyy · h:mm a");
+%>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>UniBook - Main Wall</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UniBook - Events &amp; Posts</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/app.css"/>
 
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
         }
 
         body {
@@ -19,7 +46,6 @@
             color: #1E293B;
             overflow-x: hidden;
             position: relative;
-            padding-bottom: 95px;
         }
 
         body::before,
@@ -171,14 +197,53 @@
             box-shadow: 0 8px 18px rgba(37, 99, 235, 0.18);
         }
 
-        .post-input {
+        .composer-form {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .composer-form textarea {
+            width: 100%;
+            min-height: 72px;
             border: 1px solid #BFDBFE;
             background: #F8FAFC;
             border-radius: 18px;
             padding: 14px 16px;
             font-size: 15px;
-            color: #64748B;
+            color: #1E293B;
+            font-family: inherit;
+            resize: vertical;
+        }
+        .composer-form textarea:focus {
+            outline: none;
+            border-color: #60A5FA;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+        }
+        .composer-submit {
+            align-self: flex-end;
+            border: none;
+            border-radius: 14px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #2563EB, #60A5FA);
+            color: #fff;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .post-delete-btn {
+            margin-top: 10px;
+            border: 1px solid #FECACA;
+            background: #FEF2F2;
+            color: #B91C1C;
+            border-radius: 12px;
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .post-delete-btn:hover {
+            background: #FEE2E2;
         }
 
         .composer-actions {
@@ -436,164 +501,91 @@
         }
     </style>
 </head>
-<body>
+<body class="app-body">
     <div class="page">
 
-        <div class="topbar">
-            <div class="brand">Uni<span>Book</span></div>
+        <%@ include file="/includes/appTopbar.jspf" %>
 
-            <div class="top-icons">
-                <button class="icon-btn" title="Create Post">✏</button>
-                <button class="icon-btn" title="Search">⌕</button>
-                <button class="icon-btn" title="Alerts">🔔</button>
-                <button class="icon-btn" title="Chat">✉</button>
-            </div>
-        </div>
+        <% if ("1".equals(request.getParameter("posted"))) { %>
+            <div class="flash ok" style="max-width:520px;margin:0 auto 14px;padding:0 16px;">Post published.</div>
+        <% } %>
+        <% if ("empty".equals(request.getParameter("error"))) { %>
+            <div class="flash err" style="max-width:520px;margin:0 auto 14px;padding:0 16px;">Write something before posting.</div>
+        <% } %>
+        <% if ("len".equals(request.getParameter("error"))) { %>
+            <div class="flash err" style="max-width:520px;margin:0 auto 14px;padding:0 16px;">Post is too long (max 8,000 characters).</div>
+        <% } %>
+        <% if ("1".equals(request.getParameter("deleted"))) { %>
+            <div class="flash ok" style="max-width:520px;margin:0 auto 14px;padding:0 16px;">Post deleted.</div>
+        <% } %>
+        <% if ("delpost".equals(request.getParameter("error"))) { %>
+            <div class="flash err" style="max-width:520px;margin:0 auto 14px;padding:0 16px;">You can only delete your own posts.</div>
+        <% } %>
 
         <div class="composer glass-card">
-            <div class="composer-top">
-                <div class="avatar">A</div>
-                <div class="post-input">What's happening in your university today?</div>
-            </div>
-
-            <div class="composer-actions">
-                <button class="mini-action">🖼 Image</button>
-                <button class="mini-action">🎥 Video</button>
-                <button class="mini-action">📎 Attach</button>
-            </div>
+            <form action="<%= request.getContextPath() %>/feed" method="post">
+                <div class="composer-top">
+                    <div class="avatar"><%= loggedUser.getFirstName() != null && !loggedUser.getFirstName().isEmpty()
+                            ? loggedUser.getFirstName().substring(0, 1).toUpperCase() : "U" %></div>
+                    <div class="composer-form">
+                        <label for="postContent" class="visually-hidden">Post content</label>
+                        <textarea id="postContent" name="content" maxlength="8000" required placeholder="What's happening in your university today?"></textarea>
+                        <button type="submit" class="composer-submit">Post</button>
+                    </div>
+                </div>
+            </form>
         </div>
 
-        <div class="stories-section">
-            <div class="story-card">
-                <div class="story-circle">＋</div>
-                <div class="story-name">Add Story</div>
-            </div>
-
-            <div class="story-card">
-                <div class="story-circle">HC</div>
-                <div class="story-name">Horizon</div>
-            </div>
-
-            <div class="story-card">
-                <div class="story-circle">NS</div>
-                <div class="story-name">NSBM</div>
-            </div>
-
-            <div class="story-card">
-                <div class="story-circle">SL</div>
-                <div class="story-name">SLIIT</div>
-            </div>
-
-            <div class="story-card">
-                <div class="story-circle">KI</div>
-                <div class="story-name">KIU</div>
-            </div>
-
-            <div class="story-card">
-                <div class="story-circle">IJ</div>
-                <div class="story-name">IIT</div>
-            </div>
-        </div>
+        <p style="text-align:center;font-size:13px;color:#64748B;margin:8px 0 14px;">Showing your posts and posts from friends</p>
 
         <div class="feed">
+            <% if (timelinePosts == null || timelinePosts.isEmpty()) { %>
+                <div class="glass-card" style="padding:24px;text-align:center;color:#64748B;font-size:15px;">
+                    No posts yet. Add friends to see their updates, or write the first post.
+                </div>
+            <% } else {
+                for (Post post : timelinePosts) {
+                    User author = post.getAuthor();
+                    String initials = "?";
+                    if (author != null && author.getFirstName() != null && !author.getFirstName().isEmpty()) {
+                        initials = author.getFirstName().substring(0, 1).toUpperCase();
+                    }
+                    String authorName = author != null ? author.getFullName() : "User";
+                    String timeStr = post.getCreatedAt() != null ? post.getCreatedAt().format(postTimeFmt) : "";
+            %>
             <div class="post-card glass-card">
                 <div class="post-header">
-                    <div class="post-avatar">HW</div>
+                    <% if (author != null && author.getProfilePicturePath() != null && !author.getProfilePicturePath().isEmpty()) { %>
+                        <div class="post-avatar" style="padding:0;overflow:hidden;background:none;">
+                            <img src="<%= request.getContextPath() %>/<%= author.getProfilePicturePath() %>" alt="" style="width:100%;height:100%;object-fit:cover;"/>
+                        </div>
+                    <% } else { %>
+                        <div class="post-avatar"><%= initials %></div>
+                    <% } %>
                     <div class="post-meta">
-                        <div class="post-name">Horizon Students Community</div>
-                        <div class="post-time">Today • 08:39 AM</div>
-                        <span class="post-tag">University Update</span>
+                        <div class="post-name"><%= HtmlEscape.escape(authorName) %></div>
+                        <div class="post-time"><%= HtmlEscape.escape(timeStr) %></div>
+                        <% if (post.getAuthorId() == loggedUser.getUserId()) { %>
+                            <span class="post-tag">You</span>
+                        <% } else { %>
+                            <span class="post-tag">Friend</span>
+                        <% } %>
                     </div>
                 </div>
-
-                <div class="post-text">
-                    Our campus coding competition registration is now open. Students can register before Friday and take part in the innovation challenge this weekend.
-                </div>
-
-                <div class="post-image">Campus Event</div>
-
-                <div class="post-actions">
-                    <button class="post-action-btn">👍 Like</button>
-                    <button class="post-action-btn">💬 Comment</button>
-                    <button class="post-action-btn">↗ Share</button>
-                </div>
+                <div class="post-text"><%= HtmlEscape.escape(post.getContent()).replace("\n", "<br/>") %></div>
+                <% if (post.getAuthorId() == loggedUser.getUserId()) { %>
+                <form method="post" action="<%= request.getContextPath() %>/feed" onsubmit="return confirm('Delete this post permanently?');">
+                    <input type="hidden" name="action" value="delete"/>
+                    <input type="hidden" name="postId" value="<%= post.getPostId() %>"/>
+                    <button type="submit" class="post-delete-btn">Delete post</button>
+                </form>
+                <% } %>
             </div>
-
-            <div class="post-card glass-card">
-                <div class="post-header">
-                    <div class="post-avatar">AN</div>
-                    <div class="post-meta">
-                        <div class="post-name">Alex Nirmal</div>
-                        <div class="post-time">Today • 10:12 AM</div>
-                        <span class="post-tag">Student Post</span>
-                    </div>
-                </div>
-
-                <div class="post-text">
-                    Just completed the first UI flow for our UniBook Java web project. Next step is building the main feed and connecting the database.
-                </div>
-
-                <div class="post-image">Project Progress</div>
-
-                <div class="post-actions">
-                    <button class="post-action-btn">👍 Like</button>
-                    <button class="post-action-btn">💬 Comment</button>
-                    <button class="post-action-btn">↗ Share</button>
-                </div>
-            </div>
-
-            <div class="post-card glass-card">
-                <div class="post-header">
-                    <div class="post-avatar">NS</div>
-                    <div class="post-meta">
-                        <div class="post-name">NSBM Media Club</div>
-                        <div class="post-time">Yesterday • 06:20 PM</div>
-                        <span class="post-tag">Club News</span>
-                    </div>
-                </div>
-
-                <div class="post-text">
-                    Photography workshop will be held on Saturday evening at the main auditorium. Limited seats are available for interested students.
-                </div>
-
-                <div class="post-image">Workshop</div>
-
-                <div class="post-actions">
-                    <button class="post-action-btn">👍 Like</button>
-                    <button class="post-action-btn">💬 Comment</button>
-                    <button class="post-action-btn">↗ Share</button>
-                </div>
-            </div>
+            <% } } %>
         </div>
     </div>
 
-    <div class="bottom-nav">
-        <div class="bottom-nav-inner">
-            <button class="nav-item active">
-                <span class="nav-icon">👤</span>
-                <span>Account</span>
-            </button>
-
-            <button class="nav-item">
-                <span class="nav-icon">👥</span>
-                <span>Friends</span>
-            </button>
-
-            <button class="nav-item">
-                <span class="nav-icon">🏫</span>
-                <span>University</span>
-            </button>
-
-            <button class="nav-item">
-                <span class="nav-icon">📅</span>
-                <span>Events</span>
-            </button>
-
-            <button class="nav-item">
-                <span class="nav-icon">📘</span>
-                <span>Tutorials</span>
-            </button>
-        </div>
-    </div>
+    <% request.setAttribute("navActive", "feed"); %>
+    <%@ include file="/includes/bottomNav.jspf" %>
 </body>
 </html>

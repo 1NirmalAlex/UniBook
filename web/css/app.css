@@ -1,0 +1,151 @@
+/* UniBook logged-in shell: bottom nav + common spacing */
+body.app-body {
+    padding-bottom: 96px;
+}
+
+.bottom-nav {
+    position: fixed;
+    left: 50%;
+    bottom: 14px;
+    transform: translateX(-50%);
+    width: calc(100% - 24px);
+    max-width: 560px;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(203, 213, 225, 0.8);
+    border-radius: 24px;
+    box-shadow: 0 16px 36px rgba(37, 99, 235, 0.12);
+    padding: 10px 8px;
+}
+
+.bottom-nav-inner {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 4px;
+}
+
+.bottom-nav .nav-item {
+    border: none;
+    background: transparent;
+    border-radius: 16px;
+    padding: 10px 4px;
+    color: #64748B;
+    cursor: pointer;
+    transition: background 0.25s ease, transform 0.25s ease, color 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    text-decoration: none;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.bottom-nav .nav-item:hover,
+.bottom-nav .nav-item.active {
+    background: #EFF6FF;
+    color: #2563EB;
+    transform: translateY(-2px);
+}
+
+.bottom-nav .nav-icon {
+    font-size: 18px;
+}
+
+.app-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.app-topbar .brand {
+    font-size: 28px;
+    font-weight: 800;
+    color: #2563EB;
+    letter-spacing: 0.5px;
+    text-decoration: none;
+}
+
+.app-topbar .brand span {
+    color: #1E293B;
+}
+
+.app-topbar .logout {
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748B;
+    text-decoration: none;
+}
+
+.app-topbar .logout:hover {
+    color: #2563EB;
+}
+
+.app-topbar.app-topbar--unified {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.app-topbar-links {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.app-topbar-links a {
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748B;
+    text-decoration: none;
+}
+
+.app-topbar-links a:hover {
+    color: #2563EB;
+}
+
+.page-shell {
+    position: relative;
+    z-index: 1;
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 18px 16px 25px;
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(203, 213, 225, 0.75);
+    border-radius: 24px;
+    box-shadow: 0 18px 40px rgba(37, 99, 235, 0.10);
+}
+
+.flash {
+    padding: 12px 14px;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.flash.ok {
+    background: #ECFDF5;
+    border: 1px solid #A7F3D0;
+    color: #047857;
+}
+
+.flash.err {
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    color: #DC2626;
+}

@@ -1,0 +1,35 @@
+<%@ page contentType="text/html" pageEncoding="UTF-8"%>
+<%
+    String navActive = (String) request.getAttribute("navActive");
+    if (navActive == null) {
+        navActive = "";
+    }
+%>
+<div class="bottom-nav">
+    <div class="bottom-nav-inner">
+        <a class="nav-item<%= "profile".equals(navActive) ? " active" : "" %>" href="${pageContext.request.contextPath}/profile">
+            <span class="nav-icon">👤</span>
+            <span>Profile</span>
+        </a>
+        <a class="nav-item<%= "friends".equals(navActive) ? " active" : "" %>" href="${pageContext.request.contextPath}/friends">
+            <span class="nav-icon">👥</span>
+            <span>Friends</span>
+        </a>
+        <a class="nav-item<%= "feed".equals(navActive) ? " active" : "" %>" href="${pageContext.request.contextPath}/feed">
+            <span class="nav-icon">📰</span>
+            <span>Feed</span>
+        </a>
+        <a class="nav-item<%= "events".equals(navActive) ? " active" : "" %>" href="${pageContext.request.contextPath}/events">
+            <span class="nav-icon">📅</span>
+            <span>Events</span>
+        </a>
+        <a class="nav-item<%= "kuppiya".equals(navActive) ? " active" : "" %>" href="${pageContext.request.contextPath}/kuppiya">
+            <span class="nav-icon">📚</span>
+            <span>Kuppiya</span>
+        </a>
+        <a class="nav-item<%= "communities".equals(navActive) ? " active" : "" %>" href="${pageContext.request.contextPath}/communities">
+            <span class="nav-icon">🏛</span>
+            <span>Groups</span>
+        </a>
+    </div>
+</div>

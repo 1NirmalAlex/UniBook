@@ -1,0 +1,8 @@
+<%@ page import="com.unibook.model.User" %>
+<%
+    User loggedUser = (User) session.getAttribute("loggedUser");
+    if (loggedUser == null) {
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        return;
+    }
+%>
