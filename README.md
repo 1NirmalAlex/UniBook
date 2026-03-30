@@ -2,6 +2,16 @@
 
 Java **Servlet + JSP** web app for a campus social network: profiles, friends, feed, events, kuppiya (study sessions), and communities. Built with **MVC**, **DAO + JDBC** (MySQL), **Ant** (NetBeans), deployed on **Apache Tomcat**. This is **not** Spring Boot or Maven.
 
+## Cloning on another computer (NetBeans)
+
+If the project shows errors or “cannot be opened” after `git clone`, it is usually one of these:
+
+1. **Wrong Tomcat paths in Git** — Do not commit `nbproject/private/private.properties`. It stores *your* PC’s Tomcat folder. Teammates should open the project in NetBeans, then set **Tools → Servers** (or project **Properties → Run**) and choose their own Tomcat install.
+2. **Missing MySQL JAR** — The driver must be in `web/WEB-INF/lib/` (it is tracked in this repo). If someone still has an old clone, run **Clean and Build** after `git pull`.
+3. **JDK** — Use **JDK 17** (matches `javac.source` / `javac.target` in `project.properties`).
+
+Also create/configure `src/java/com/unibook/config/db.properties` and import `sql/unibook_schema.sql` into MySQL (see below).
+
 ## Requirements
 
 - JDK 17+

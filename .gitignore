@@ -12,6 +12,7 @@
 
 # Package Files #
 *.jar
+!web/WEB-INF/lib/*.jar
 *.war
 *.nar
 *.ear
@@ -24,3 +25,6 @@ hs_err_pid*
 replay_pid*
 /build/
 /dist/
+
+# NetBeans: machine-specific Tomcat/JDK paths (each developer regenerates locally)
+nbproject/private/
